@@ -1,0 +1,394 @@
+﻿<!DOCTYPE html>
+<html><head><title>{{html.title}}</title>
+
+	<style media="all" type="text/css">@media only screen and (max-width: 480px) {
+
+  table[class=body] h1 {
+
+    font-size: 24px !important;
+
+  }
+
+  table[class=body] h2 {
+
+    font-size: 20px !important;
+
+  }
+
+  table[class=body] h3 {
+
+    font-size: 14px !important;
+
+  }
+
+  table[class=body] .content,
+
+  table[class=body] .wrapper {
+
+    padding: 15px !important;
+
+  }
+
+  table[class=body] .container {
+
+    width: 100% !important;
+
+    padding: 0 !important;
+
+  }
+
+  table[class=body] .column {
+
+    width: 100% !important;
+
+  }
+
+  table[class=body] .stats .column {
+
+    width: 50% !important;
+
+  }
+
+  table[class=body] .hero-image,
+
+  table[class=body] .thumb {
+
+    width: 100% !important;
+
+    height: auto !important;
+
+  }
+
+  table[class=body] .btn table,
+
+  table[class=body] .btn a {
+
+    width: 100% !important;
+
+  }
+
+  table[class=body] .stats-table {
+
+    display: none !important;
+
+  }
+
+  table[class=body] .stats-labels .label,
+
+  table[class=body] .category-labels .label {
+
+    font-size: 10px !important;
+
+  }
+
+  table[class=body] .credits table {
+
+    table-layout: auto !important;
+
+  }
+
+  table[class=body] .credits .label {
+
+    font-size: 11px !important;
+
+  }
+
+}
+
+	</style>
+
+	<style type="text/css">@font-face {
+
+    font-family: 'Open Sans';
+
+    font-style: normal;
+
+    font-weight: 300;
+
+    src: local('Open Sans Light'), local('OpenSans-Light'), url(https://fonts.gstatic.com/s/opensans/v13/DXI1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf) format('truetype');
+
+}
+
+
+
+
+
+@font-face {
+
+    font-family: 'Open Sans';
+
+    font-style: normal;
+
+    font-weight: 400;
+
+    src: local('Open Sans'), local('OpenSans'), url(https://fonts.gstatic.com/s/opensans/v13/cJZKeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf) format('truetype');
+
+}
+
+
+
+
+
+@font-face {
+
+    font-family: 'Open Sans';
+
+    font-style: normal;
+
+    font-weight: 600;
+
+    src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url(https://fonts.gstatic.com/s/opensans/v13/MTP_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf) format('truetype');
+
+}
+
+	</style>
+
+	<!--[if mso]>
+
+		<style>
+
+		  h1, h2, h3, h4,
+
+		  p, ol, ul {
+
+		    font-family: Arial, sans-serif !important;
+
+		  }
+
+		</style>
+
+	<![endif]-->
+
+
+	<style>
+	div.ContentDiv { background-color: #fff; overflow: auto; clear: both; position: relative; font-size: 0.75em; line-height: 1.6; }
+
+div.InnerContent { padding: 1em 1em 0; }
+    div.InnerContent.grid { padding-left: 0; padding-right: 0; }
+
+#ScrollableBottom { overflow: auto; }
+
+#scroll_mask { display: none; position: fixed; left: 0; right: 20px; height: 12px; background: white; background: -webkit-gradient(linear, 0 35%, 0 100%, from(#fff), to(rgba(255,255,255,0))); background: -moz-linear-gradient(top, #fff 25%, rgba(255,255,255,0) 75%); background: -o-linear-gradient(top, #fff 25%, rgba(255,255,255,0) 75%); background: -ms-linear-gradient(top, #fff 25%, rgba(255,255,255,0) 75%); }
+
+/* EMAIL VIEW FRAME (Iframe that contains all messages) */
+body.viewframe { font-family: Helvetica, Arial, sans-serif; font-size: 75%; line-height: 1.5; color: #222; padding: 0; }
+
+/* Container for email content */
+div.printable { line-height: 1.4; padding: 0.7em; }
+
+/* MAIN STRUCTURE */
+body.Root, body.Login, body.Wizard, body.Error { background-color: #444; }
+
+body.Root { min-width: 800px; }
+
+div.container { position: relative; overflow: hidden; z-index: 2; background-color: #444; }
+
+div.main { background-color: white !important; }
+
+div.nav, div.left-pane, div.splitter { float: left; }
+
+div.left-pane { margin-right: 2px; border-radius: 5px 5px 0 0; }
+    div.left-pane.horizontal { float: none; margin-right: 0; margin-bottom: 2px; }
+
+div.nav { width: 55px; position: relative; z-index: 7000; }
+
+div.main { position: relative; overflow: hidden; }
+    div.main.faux { border-top: 2px solid #444; }
+
+div#PageHeader + div.container > div.main { border-radius: 5px 0 0 0; -moz-border-radius: 5px 0 0 0; }
+
+body.PreviewContent span[id*="UpdatePanel"] { display: block; }
+
+.clearfix:after { content: ""; display: block; clear: both; height: 0; line-height: 0; visibility: hidden; }
+
+.important { color: #f00; }
+
+span.clickable { border-color: #333; border-style: dotted; border-width: 0 0 1px; cursor: pointer; }
+
+.wrapword{
+	white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+	white-space: -webkit-pre-wrap; /*Chrome & Safari */ 
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	white-space: pre-wrap;       /* css-3 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+	word-break: break-all;
+	white-space: normal;
+}
+	</style>
+
+
+<style></style><style></style></head><body class="viewframe"><table bgcolor="#fdfdfd" class="body" style="box-sizing: border-box; border-spacing: 0; mso-table-rspace: 0pt; mso-table-lspace: 0pt; width: 100%; background-color: #fdfdfd; border-collapse: separate !important;" width="100%">
+
+	<tbody>
+
+		<tr>
+
+			<td style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top;" valign="top">&nbsp;</td>
+
+			<td class="container" style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top; display: block; width: 600px; max-width: 600px; margin: 0 auto !important;" valign="top" width="600">
+
+			<div class="content" style="box-sizing: border-box; display: block; max-width: 600px; margin: 0 auto; padding: 10px;"><span class="
+			preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">{{email.preheader}}</span>
+
+			<div class="header" style="box-sizing: border-box; width: 100%; margin-bottom: 30px; margin-top: 15px;">
+
+			<table style="box-sizing: border-box; width: 100%; border-spacing: 0; mso-table-rspace: 0pt; mso-table-lspace: 0pt; border-collapse: separate !important;" width="100%">
+
+				<tbody>
+
+					<tr>
+
+						<td align="left" class="align-left" style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top; text-align: center;" valign="top"><a href="{{logo.href}}" style="box-sizing: border-box; color: #009cea; font-weight: 400; text-decoration: none;" target="_blank"><img alt="{{logo.alt}}" height="80" src="{{logo.src}}" style="max-width: 100%; border-style: none; width: auto; height: 80px;" width="auto"></a></td>
+
+					</tr>
+
+				</tbody>
+
+			</table>
+
+			</div>
+
+
+
+			<div class="block" style="box-sizing: border-box; width: 100%; margin-bottom: 30px; background: #ffffff; border: 1px solid #f0f0f0;">
+
+			<table style="box-sizing: border-box; width: 100%; border-spacing: 0; mso-table-rspace: 0pt; mso-table-lspace: 0pt; border-collapse: separate !important;" width="100%">
+
+				<tbody>
+
+					<tr>
+
+						<td class="wrapper" style="box-sizing: border-box; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top; padding: 30px;" valign="top">
+
+						<table style="box-sizing: border-box; width: 100%; border-spacing: 0; mso-table-rspace: 0pt; mso-table-lspace: 0pt; border-collapse: separate !important;" width="100%">
+
+							<tbody>
+
+								<tr>
+
+									<td style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top;" valign="top">
+
+									<h2 style="margin: 0; margin-bottom: 30px; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-weight: 300; line-height: 1.5; font-size: 24px; color: #294661 !important;">{{content.title}}<br>
+									<br />
+									
+									<p style="margin: 0; margin-bottom: 30px; color: #294661; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 300;">
+									  {{content.message}}
+									</p>
+									</td>
+
+								</tr>
+								
+								<tr>
+
+									<td style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top;" valign="top">
+
+									<table cellpadding="0" cellspacing="0" class="btn btn-primary" style="box-sizing: border-box; border-spacing: 0; mso-table-rspace: 0pt; mso-table-lspace: 0pt; width: 100%; border-collapse: separate !important;" width="100%">
+
+										<tbody>
+
+											<tr>
+
+												<td align="center" style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top; padding-bottom: 15px;" valign="top">
+
+												<table cellpadding="0" cellspacing="0" style="box-sizing: border-box; border-spacing: 0; mso-table-rspace: 0pt; mso-table-lspace: 0pt; width: auto; border-collapse: separate !important;">
+
+													<tbody>
+
+														<tr>
+
+															<td align="center" bgcolor="#009cea" style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top; background-color: #009cea; border-radius: 2px; text-align: center;" valign="top"><a href="{{button.href}}" style="box-sizing: border-box; border-color: #009cea; font-weight: 400; text-decoration: none; display: inline-block; margin: 0; color: #ffffff; background-color: #009cea; border: solid 1px #009cea; border-radius: 2px; cursor: pointer; font-size: 14px; padding: 12px 45px;" target="_blank">{{button.text}}</a></td>
+
+														</tr>
+
+													</tbody>
+
+												</table>
+
+												</td>
+
+											</tr>
+
+										</tbody>
+
+									</table>
+
+									</td>
+
+								</tr>
+								
+								<tr>
+
+									<td style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top;" valign="top">
+									<br />
+									
+									
+									
+									<hr style="border: 0; border-top: 1px solid #eee; box-sizing: content-box; height: 0; overflow: visible;">
+									
+									<p style="margin: 0; color: gray; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 300;">								
+									  {{content.footer}}
+									</p>
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+
+						</td>
+
+					</tr>
+
+				</tbody>
+
+			</table>
+
+			</div>
+
+
+
+			<div class="footer" style="box-sizing: border-box; clear: both; width: 100%;">
+
+			<table style="box-sizing: border-box; width: 100%; border-spacing: 0; mso-table-rspace: 0pt; mso-table-lspace: 0pt; font-size: 12px; border-collapse: separate !important;" width="100%">
+
+				<tbody>
+
+					<tr style="font-size: 12px;">
+
+						<td align="center" class="align-center" style="box-sizing: border-box; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; vertical-align: top; font-size: 12px; text-align: center; padding: 20px 0;" valign="top">
+   						
+						<a href="https://fature.me/" target="_blank">
+						  <img alt="fature.me" height="20" src="https://auth.fature.me/img/logo.png" style="max-width: 100%; border-style: none; width: auto; height: 20px;" width="auto" />
+						</a>
+						
+						<p style="margin: 0; color: #294661; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-weight: 300; font-size: 12px; margin-bottom: 5px;">
+						  <a href="https://fature.me/" target="_blank">fature.me</a>
+						</p>
+
+
+						</td>
+
+					</tr>
+
+				</tbody>
+
+			</table>
+
+			</div>
+
+			</div>
+
+			</td>
+
+			<td style="box-sizing: border-box; padding: 0; font-family: 'Open Sans', 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 16px; vertical-align: top;" valign="top">&nbsp;</td>
+
+		</tr>
+
+	</tbody>
+
+</table>
+
+
+</body></html>
