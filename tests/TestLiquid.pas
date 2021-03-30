@@ -15,9 +15,7 @@ uses
   TestFramework, System.Generics.Collections,
   System.SysUtils, System.RegularExpressions,
   System.IOUtils, System.Rtti,
-
-  Bcl.Json,
-  Bcl.Json.Classes,
+  System.JSON, REST.Json,
 
   Liquid.Interfaces,
   Liquid.Default,
@@ -35,6 +33,8 @@ type
   strict private
     FContext: ILiquidContext;
   protected
+    function SerializeArray<T: class>(Arr: TArray<T>): string;
+    function SerializeObj(Obj: TObject): string;
     procedure CheckCondition(Expected: boolean; const Left: string;
       const _Operator: string; const Right: string);
     procedure CheckConditionTrue(const Left: string; const _Operator: string; const Right: string);
@@ -504,8 +504,8 @@ begin
       '  "clone": %1:s,' +
       '  "camry": %2:s' +
       '}',
-      [TJson.SerializeAs<TArray<TCar>>(Cars.ToArray),
-       TJson.Serialize(Cars.First), TJson.Serialize(Cars.Last)]
+      [SerializeArray<TCar>(Cars.ToArray),
+       SerializeObj(Cars.First), SerializeObj(Cars.Last)]
     );
     var Hash := THash.FromJson(Json);
     try
@@ -610,7 +610,7 @@ begin
   Json := '{"published_at":"2013-12-25T12:12:20.050"}';
   CheckTemplateResult('12/25/2013 12:12:20', '{{ published_at }}', Json);
 
-  FormatSettings := TFormatSettings.Create;
+  FormatSettings := TFormatSettings.Invariant;
   FormatSettings.DateSeparator := '-';
   FormatSettings.TimeSeparator := ';';
   Context := TLiquidContext.Create(FormatSettings);
@@ -908,9 +908,9 @@ begin
       '  "clone": %1:s,' +
       '  "camry": %3:s' +
       '}',
-      [TJson.SerializeAs<TArray<TCar>>(Cars.ToArray),
-       TJson.Serialize(Cars.First), TJson.Serialize(Cars.Last),
-       TJson.Serialize(Camry)]
+      [SerializeArray<TCar>(Cars.ToArray),
+       SerializeObj(Cars.First), SerializeObj(Cars.Last),
+       SerializeObj(Camry)]
     );
   finally
     Camry.Free;
@@ -963,11 +963,11 @@ begin
       '  "person1_clone": %4:s,' +
       '  "person2": %5:s' +
       '}',
-      [TJson.SerializeAs<TArray<TCar>>(Cars.ToArray),
-       TJson.SerializeAs<TArray<TCar>>([Cars.First, Cars.Last]),
-       TJson.Serialize(Cars.First), TJson.Serialize(Cars.Last),
-       TJson.Serialize(Person1),
-       TJson.Serialize(Person2)]
+      [SerializeArray<TCar>(Cars.ToArray),
+       SerializeArray<TCar>([Cars.First, Cars.Last]),
+       SerializeObj(Cars.First), SerializeObj(Cars.Last),
+       SerializeObj(Person1),
+       SerializeObj(Person2)]
     );
   finally
     Cars.Free;
@@ -1366,6 +1366,28 @@ begin
   finally
     T.Free;
   end;
+end;
+
+function LiquidBaseTestCase.SerializeArray<T>(Arr: TArray<T>): string;
+var
+  JArray: TJSONArray;
+  Item: T;
+begin
+  JArray := TJSONArray.Create;
+  try
+    for Item in Arr do
+      JArray.Add(TJSON.ObjectToJsonObject(Item,
+        [joDateIsUTC, joDateFormatISO8601, joBytesFormatArray, joIndentCasePreserve]));
+    Result := JArray.ToJSON;
+  finally
+    JArray.Free;
+  end;
+end;
+
+function LiquidBaseTestCase.SerializeObj(Obj: TObject): string;
+begin
+  Result := TJSON.ObjectToJsonString(Obj,
+    [joDateIsUTC, joDateFormatISO8601, joBytesFormatArray, joIndentCasePreserve]);
 end;
 
 procedure LiquidBaseTestCase.SetContext(Context: ILiquidContext);

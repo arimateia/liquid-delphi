@@ -3,13 +3,9 @@ unit Liquid.Hash;
 interface
 
 uses
-  System.SysUtils, System.Rtti,
+  System.SysUtils, System.Rtti, System.JSON, System.DateUtils,
   System.RegularExpressions,
   System.Generics.Collections,
-
-  Bcl.Json,
-  Bcl.Json.Classes,
-  Bcl.Utils,
 
   Liquid.Interfaces;
 
@@ -52,12 +48,13 @@ type
   strict private
     FJson: string;
     FLevelCount: integer;
-    function GetHash(JElement: TJElement): IHash; overload;
-    function GetHash(JObject: TJObject): IHash; overload;
+    function GetHash(JValue: TJSONValue): IHash; overload;
+    function GetHash(JObject: TJSONObject): IHash; overload;
     //
-    function GetElementValue(JElement: TJElement): TValue;
-    function GetPrimitiveValue(JPrimitive: TJPrimitive): TValue;
-    function GetArrayValue(JArray: TJArray): TValue;
+    function GetElementValue(JValue: TJSONValue): TValue;
+    function GetStringValue(JString: TJSONString): TValue;
+    function GetNumberValue(JNumber: TJSONNumber): TValue;
+    function GetArrayValue(JArray: TJSONArray): TValue;
   public
     constructor Create(const AJson: string);
     function CreateHash: IHash;
@@ -173,23 +170,23 @@ end;
 function THashJsonFactory.CreateHash: IHash;
 begin
   FLevelCount := 0;
-  var JElement := TJson.Deserialize<TJElement>(FJson);
+  var JValue := TJSONObject.ParseJSONValue(FJson);
   try
-    Result := GetHash(JElement);
+    Result := GetHash(JValue);
   finally
-    JElement.Free;
+    JValue.Free;
   end;
 end;
 
-function THashJsonFactory.GetHash(JElement: TJElement): IHash;
+function THashJsonFactory.GetHash(JValue: TJSONValue): IHash;
 begin
-  if JElement.IsObject then
-    Result := GetHash(JElement.AsObject)
+  if JValue is TJSONObject then
+    Result := GetHash(TJSONObject(JValue))
   else
-    raise EArgumentException.Create('JElement conversion to THash is not possible');
+    raise EArgumentException.Create('JSON value conversion to THash is not possible');
 end;
 
-function THashJsonFactory.GetArrayValue(JArray: TJArray): TValue;
+function THashJsonFactory.GetArrayValue(JArray: TJSONArray): TValue;
 begin
   var ArrayList := TList<TValue>.Create;
   try
@@ -201,51 +198,54 @@ begin
   end;
 end;
 
-function THashJsonFactory.GetElementValue(JElement: TJElement): TValue;
+function THashJsonFactory.GetElementValue(JValue: TJSONValue): TValue;
 begin
-  if JElement.IsPrimitive then
-    Result := GetPrimitiveValue(JElement.AsPrimitive)
-  else if JElement.IsObject then
-    Result := TValue.From<IHash>(GetHash(JElement.AsObject))
-  else if JElement.IsArray then
-    Result := GetArrayValue(JElement.AsArray)
-  else if JElement.IsNull then
+  if JValue is TJSONNumber then
+    Result := GetNumberValue(TJSONNumber(JValue))
+  else if JValue is TJSONString then
+    Result := GetStringValue(TJSONString(JValue))
+  else if JValue is TJSONBool then
+    Result := TJSONBool(JValue).AsBoolean
+  else if JValue is TJSONObject then
+    Result := TValue.From<IHash>(GetHash(TJSONObject(JValue)))
+  else if JValue is TJSONArray then
+    Result := GetArrayValue(TJSONArray(JValue))
+  else if JValue is TJSONNull then
     Result := TValue.Empty
   else
-    raise EArgumentException.Create('JElement conversion to TValue is not possible');
+    raise EArgumentException.Create('JSON value conversion to TValue is not possible');
 end;
 
-function THashJsonFactory.GetHash(JObject: TJObject): IHash;
+function THashJsonFactory.GetHash(JObject: TJSONObject): IHash;
 begin
   Result := THash.Create;
   for var Member in JObject do
-    Result.Add(Member.Name, GetElementValue(Member.Value));
+    Result.Add(Member.JsonString.Value, GetElementValue(Member.JsonValue));
 end;
 
-function THashJsonFactory.GetPrimitiveValue(JPrimitive: TJPrimitive): TValue;
+function THashJsonFactory.GetStringValue(JString: TJSONString): TValue;
 begin
-  if JPrimitive.IsBoolean then
-    Result := JPrimitive.AsBoolean
-  else if JPrimitive.IsString then
-  begin
-    if JPrimitive.AsString.Trim = '' then
-      Exit(JPrimitive.AsString);
-    var Date: TDate;
-    if TBclUtils.TryISOToDate(JPrimitive.AsString, Date) then
-      Exit(Date);
-    var DateTime: TDateTime;
-    if TBclUtils.TryISOToDateTime(JPrimitive.AsString, DateTime) then
-      Exit(DateTime);
-    Result := JPrimitive.AsString;
-  end
-  else if JPrimitive.IsInteger then
-    Result := JPrimitive.AsInteger
-  else if JPrimitive.IsDouble then
-    Result := JPrimitive.AsDouble
-  else if JPrimitive.IsInt64 then
-    Result := JPrimitive.AsInt64
+  if JString.Value.Trim = '' then
+    Exit(JString.Value);
+  var DateTime: TDateTime;
+  if TryISO8601ToDate(JString.Value, DateTime) then
+    Exit(DateTime);
+  Result := JString.Value
+end;
+
+function THashJsonFactory.GetNumberValue(JNumber: TJSONNumber): TValue;
+begin
+  if Pos('.', JNumber.ToString) > 0 then
+    Result := JNumber.AsDouble
   else
-    raise EArgumentException.Create('Primitive value not supported');
+  begin
+    var Int64Value := JNumber.AsInt64;
+    var IntValue := JNumber.AsInt;
+    if IntValue = Int64Value then
+      Result := IntValue
+    else
+      Result := Int64Value;
+  end;
 end;
 
 end.
