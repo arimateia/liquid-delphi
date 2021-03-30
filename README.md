@@ -8,6 +8,6 @@ language](https://shopify.github.io/liquid/) and [dotLiquid](https://github.com/
 retain the same template syntax as the original, while using delphi coding
 conventions where possible.
 
-For more information about the those Liquid projects, see:
+This project uses/translates parts of the code of the following repositories:
 1. <https://shopify.github.io/liquid/>
 2. <https://github.com/dotliquid/dotliquid>
