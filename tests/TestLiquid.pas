@@ -115,6 +115,7 @@ type
     procedure BreakOutsideFor;
     procedure ContinueOutsideFor;
     procedure ArrayOfObjects;
+    procedure ForElse;
   end;
 
   Conditions = class(LiquidBaseTestCase)
@@ -1701,6 +1702,21 @@ begin
   CheckTemplateResult('+--',
     '{%for item in array%}{% if forloop.first %}+{% else %}-{% endif %}{%endfor%}',
     '{ "array": [1, 2, 3 ] }');
+end;
+
+procedure _For.ForElse;
+begin
+  var Json :=
+    '{ "array": [] }';
+
+  CheckTemplateResult('empty array',
+    '{%for i in array %}{{ i }}{% else %}empty array{%endfor%}', Json);
+
+  Json :=
+    '{ "array": [1, 2] }';
+
+  CheckTemplateResult('12',
+    '{%for i in array %}{{ i }}{% else %}empty array{%endfor%}', Json);
 end;
 
 procedure _For.ForHelpers;
