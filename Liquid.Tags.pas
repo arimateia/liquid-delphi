@@ -61,6 +61,9 @@ type
     FName: string;
     FReversed: boolean;
     FAttributes: TDictionary<string, string>;
+
+    FForBlock: INodeList;
+    FElseBlock: TCondition;
   private
     function SliceCollectionUsingEach(AContext: ILiquidContext;
       ACollection: TArray<TValue>; AFrom: integer; ATo: TValue): TArray<TValue>;
@@ -72,6 +75,8 @@ type
     procedure Initialize(const ATagName: string; const AMarkup: string;
       ATokens: TList<string>); override;
     procedure Render(Context: ILiquidContext; Writer: TTextWriter); override;
+    procedure UnknownTag(const Tag: string; const Markup: string;
+      Tokens: TList<string>); override;
   end;
 
   TBreak = class(TTag)
@@ -264,6 +269,7 @@ end;
 destructor TFor.Destroy;
 begin
   FAttributes.Free;
+  FElseBlock.Free;
   inherited;
 end;
 
@@ -273,6 +279,8 @@ begin
   var Match := FSyntax.Match(AMarkup);
   if Match.Success then
   begin
+    FForBlock := TNodeList.Create;
+    SetNodeList(FForBlock);
     FVariableName := Match.Groups[1].Value;
     FCollectionName := Match.Groups[2].Value;
     FName := Format('%s-%s', [FVariableName, FCollectionName]);
@@ -330,8 +338,6 @@ begin
   try
     Segment.AddRange(SliceCollectionUsingEach(Context,
       Collection.AsType<TArray<TValue>>, From, _To));
-    if Segment.Count = 0 then
-      Exit;
     if FReversed then
       Segment.Reverse;
     var Length := Segment.Count;
@@ -342,6 +348,13 @@ begin
     Context.Stack(
       procedure
       begin
+        if Segment.Count = 0 then
+        begin
+          if FElseBlock <> nil then
+            RenderAll(FElseBlock.Attachment, Context, Writer);
+          Exit;
+        end;
+
         for var Index := 0 to Segment.Count - 1 do
         begin
           var Item := Segment[Index];
@@ -369,7 +382,7 @@ begin
           Context['forloop'] := TValue.From<IHash>(ForLoop);
 
           try
-            RenderAll(NodeList, Context, Writer);
+            RenderAll(FForBlock, Context, Writer);
           except
             on E: EBreakInterrupt do
             begin
@@ -411,6 +424,17 @@ begin
   finally
     Segments.Free;
   end;
+end;
+
+procedure TFor.UnknownTag(const Tag, Markup: string; Tokens: TList<string>);
+begin
+  if Tag.Equals('elsefor') or Tag.Equals('else') then
+  begin
+    FElseBlock := TElseCondition.Create;
+    SetNodeList(FElseBlock.Attach(TNodeList.Create));
+  end
+  else
+    inherited UnknownTag(Tag, Markup, Tokens);
 end;
 
 { TBreak }
