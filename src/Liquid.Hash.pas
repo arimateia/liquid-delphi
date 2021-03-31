@@ -229,7 +229,7 @@ begin
     Exit(JString.Value);
   var DateTime: TDateTime;
   if TryISO8601ToDate(JString.Value, DateTime) then
-    Exit(DateTime);
+    Exit(TValue.From<TDateTime>(DateTime));
   Result := JString.Value
 end;
 

@@ -134,7 +134,7 @@ begin
 
     tkFloat:
     begin
-      if Value.IsType<TDate> or Value.IsType<TDateTime> then
+      if (Value.TypeInfo = TypeInfo(TDateTime)) then
       begin
         var DateFormatted: string;
         if Frac(Value.AsExtended) > 0 then

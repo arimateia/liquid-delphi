@@ -54,6 +54,8 @@ type
     function Date(Context: ILiquidContext; const Input: TDateTime; const Format: string): string;
     function Slice(const Input: string; Start: integer): string; overload;
     function Slice(const Input: string; Start: integer; Length: integer): string; overload;
+    function Round(const Input: double): double; overload;
+    function Round(const Input: double; Places: integer): double; overload;
   end;
 
 implementation
@@ -140,7 +142,7 @@ begin
           var Output := TValue.Empty;
           Output := RttiMethod.Invoke(Instance, InvokeArgs.ToArray);
           if not Output.IsEmpty then
-            Result := Output;
+            Exit(Output);
           Break;
         finally
           Instance.Free;
@@ -190,6 +192,20 @@ end;
 function TStandardFilters.Downcase(const Input: string): string;
 begin
   Result := Input.ToLower;
+end;
+
+function TStandardFilters.Round(const Input: double; Places: integer): double;
+begin
+  try
+    Result := RoundTo(Input, -1 * Places);
+  except
+    Result := Input;
+  end;
+end;
+
+function TStandardFilters.Round(const Input: double): double;
+begin
+  Result := Round(Input, 0);
 end;
 
 function TStandardFilters.Slice(const Input: string; Start: integer): string;
