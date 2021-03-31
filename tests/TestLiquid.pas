@@ -178,6 +178,9 @@ type
     procedure TokenizeStrings;
     procedure TokenizeVariables;
     procedure TokenizeBlocks;
+    procedure ErbLikeTrimmingLeadingWhitespace;
+    procedure ErbLikeTrailingLeadingWhitespace;
+    procedure ErbLikeTrimmingLeadingAndTrailingWhitespace;
 
     procedure InstanceAssignsPersistOnSameTemplateObjectBetweenParses;
   end;
@@ -606,26 +609,26 @@ begin
   var Json := '{"published_at":"2013-12-25"}';
   CheckTemplateResult('12/25/2013', '{{ published_at }}', Json);
 
-//  Json := '{"published_at":"2013-12-25T12:12"}';
-//  CheckTemplateResult('12/25/2013 12:12:00', '{{ published_at }}', Json);
-//
-//  Json := '{"published_at":"2013-12-25T12:12:20.050"}';
-//  CheckTemplateResult('12/25/2013 12:12:20', '{{ published_at }}', Json);
-//
-//  FormatSettings := TFormatSettings.Invariant;
-//  FormatSettings.DateSeparator := '-';
-//  FormatSettings.TimeSeparator := ';';
-//  Context := TLiquidContext.Create(FormatSettings);
-//  SetContext(Context);
-//
-//  Json := '{"published_at":"2013-12-25"}';
-//  CheckTemplateResult('12-25-2013', '{{ published_at }}', Json);
-//
-//  Json := '{"published_at":"2013-12-25T12:12"}';
-//  CheckTemplateResult('12-25-2013 12;12;00', '{{ published_at }}', Json);
-//
-//  Json := '{"published_at":"2013-12-25T12:12:20.050"}';
-//  CheckTemplateResult('12-25-2013 12;12;20', '{{ published_at }}', Json);
+  Json := '{"published_at":"2013-12-25T12:12"}';
+  CheckTemplateResult('12/25/2013 12:12:00', '{{ published_at }}', Json);
+
+  Json := '{"published_at":"2013-12-25T12:12:20.050"}';
+  CheckTemplateResult('12/25/2013 12:12:20', '{{ published_at }}', Json);
+
+  FormatSettings := TFormatSettings.Invariant;
+  FormatSettings.DateSeparator := '-';
+  FormatSettings.TimeSeparator := ';';
+  Context := TLiquidContext.Create(FormatSettings);
+  SetContext(Context);
+
+  Json := '{"published_at":"2013-12-25"}';
+  CheckTemplateResult('12-25-2013', '{{ published_at }}', Json);
+
+  Json := '{"published_at":"2013-12-25T12:12"}';
+  CheckTemplateResult('12-25-2013 12;12;00', '{{ published_at }}', Json);
+
+  Json := '{"published_at":"2013-12-25T12:12:20.050"}';
+  CheckTemplateResult('12-25-2013 12;12;20', '{{ published_at }}', Json);
 end;
 
 procedure Variables.SetUp;
@@ -666,6 +669,39 @@ begin
 end;
 
 { Template }
+
+procedure Template.ErbLikeTrailingLeadingWhitespace;
+begin
+  CheckTemplateResult('hi tobi'#13#10, '{% if true -%}'#13#10'hi tobi'#13#10'{% endif %}');
+end;
+
+procedure Template.ErbLikeTrimmingLeadingAndTrailingWhitespace;
+begin
+  var Variables := '{"tasks":["foo", "bar", "baz"]}';
+
+  var Template :=
+    '<ul>' + #13#10 +
+    '{% for item in tasks -%}' + #13#10 +
+    '    {%- if true -%}' + #13#10 +
+    '    <li>{{ item }}</li>' + #13#10 +
+    '    {%- endif -%}' + #13#10 +
+    '{% endfor -%}' + #13#10 +
+    '</ul>';
+
+  var Expected :=
+    '<ul>' + #13#10 +
+    '    <li>foo</li>' + #13#10 +
+    '    <li>bar</li>' + #13#10 +
+    '    <li>baz</li>' + #13#10 +
+    '</ul>';
+
+  CheckTemplateResult(Expected, Template, Variables);
+end;
+
+procedure Template.ErbLikeTrimmingLeadingWhitespace;
+begin
+  CheckTemplateResult('foo'#13#10'hi tobi', 'foo'#13#10#9'  {%- if true %}hi tobi{% endif %}');
+end;
 
 procedure Template.InstanceAssignsPersistOnSameTemplateObjectBetweenParses;
 begin

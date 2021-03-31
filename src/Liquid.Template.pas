@@ -235,15 +235,17 @@ begin
   if string.IsNullOrEmpty(Source) then
     Exit(TList<string>.Create);
 
-//  // Trim leading whitespace.
-//  Source := TRegEx.Replace(Source,
-//    Format('([ \t]+)?(%0:s|%1:s)', [FLiquid.VariableStart, FLiquid.TagStart]),
-//    '$2', [roNone]);
-//
-//  // Trim trailing whitespace.
-//  Source := TRegEx.Replace(Source,
-//    Format('(%0:s|%1:s)(\n|\r\n|[ \t]+)?', [FLiquid.VariableEnd, FLiquid.TagEnd]),
-//    '$1', [roNone]);
+  // Trim leading whitespace.
+  Source := TRegEx.Replace(Source,
+    Format('([ \t]+)?(%0:s|%1:s)-',
+      [LiquidRegexes.VariableStart, LiquidRegexes.TagStart]),
+    '$2', [roNone]);
+
+  // Trim trailing whitespace.
+  Source := TRegEx.Replace(Source,
+    Format('-(%0:s|%1:s)(\n|\r\n|[ \t]+)?',
+      [LiquidRegexes.VariableEnd, LiquidRegexes.TagEnd]),
+    '$1', [roNone]);
 
   Result := TList<string>.Create;
   try
