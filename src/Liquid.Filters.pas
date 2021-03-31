@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils,
-  System.Classes,
+  System.Classes, System.Math,
   System.Generics.Collections,
   System.Rtti, System.TypInfo,
 
@@ -52,6 +52,8 @@ type
     function Downcase(const Input: string): string;
     function Append(const Input: string; const Value: string): string;
     function Date(Context: ILiquidContext; const Input: TDateTime; const Format: string): string;
+    function Slice(const Input: string; Start: integer): string; overload;
+    function Slice(const Input: string; Start: integer; Length: integer): string; overload;
   end;
 
 implementation
@@ -71,6 +73,8 @@ begin
         if Method.IsConstructor then
           Continue;
         if Method.ReturnType = nil then
+          Continue;
+        if FMethods.ContainsKey(Method.Name) and (FMethods[Method.Name] = C.Value) then
           Continue;
         FMethods.Add(Method.Name, C.Value);
       end;
@@ -110,9 +114,11 @@ begin
   try
     for var Method in FMethods do
     begin
-      if Method.Key.ToLower = FilterName.ToLower then
+      if Method.Key.ToLower <> FilterName.ToLower then
+        Continue;
+      for var RttiMethod in RttiContext.GetType(Method.Value).GetMethods(Method.Key) do
       begin
-        var RttiMethod := RttiContext.GetType(Method.Value).GetMethod(Method.Key);
+        InvokeArgs.Clear;
         if (Length(RttiMethod.GetParameters) > 0) and
           (RttiMethod.GetParameters[0].ParamType.Handle = TypeInfo(ILiquidContext)) then
           InvokeArgs.Add(TValue.From<ILiquidContext>(FContext));
@@ -184,6 +190,28 @@ end;
 function TStandardFilters.Downcase(const Input: string): string;
 begin
   Result := Input.ToLower;
+end;
+
+function TStandardFilters.Slice(const Input: string; Start: integer): string;
+begin
+  Result := Slice(Input, Start, 1);
+end;
+
+function TStandardFilters.Slice(const Input: string; Start,
+  Length: integer): string;
+begin
+  if Start < 0 then
+  begin
+    Inc(Start, Input.Length);
+    if Start < 0 then
+    begin
+      Length := Max(0, Length + Start);
+      Start := 0;
+    end;
+  end;
+  if (Start + Length > Input.Length) then
+    Length := Input.Length - Start;
+  Result := Input.Substring(Start, Length);
 end;
 
 function TStandardFilters.Upcase(const Input: string): string;

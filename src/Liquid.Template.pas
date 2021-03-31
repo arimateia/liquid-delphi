@@ -13,6 +13,7 @@ uses
   Liquid.Context,
   Liquid.Hash,
   Liquid.Tag,
+  Liquid.Tags,
   Liquid.Tuples;
 
 type

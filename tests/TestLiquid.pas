@@ -162,6 +162,7 @@ type
     procedure Downcase;
     procedure Append;
     procedure Date;
+    procedure Slice;
   end;
 
   Template = class(LiquidBaseTestCase)
@@ -1442,9 +1443,9 @@ begin
 
   CheckTemplateResult('NOT EMPTY', Template, Json);
 
-//  Json := '{ "array": [] }';
-//
-//  CheckTemplateResult('EMPTY', Template, Json);
+  Json := '{ "array": [] }';
+
+  CheckTemplateResult('EMPTY', Template, Json);
 end;
 
 procedure _If.ComparisonsOnNull;
@@ -1790,24 +1791,24 @@ end;
 
 procedure _For.ForWithVariable;
 begin
-//  CheckTemplateResult(' 1  2  3 ',
-//    '{%for item in array%} {{item}} {%endfor%}',
-//    '{ "array": [ 1, 2, 3 ] }');
-//
-//  CheckTemplateResult('123',
-//    '{%for item in array%}{{item}}{%endfor%}',
-//    '{ "array": [ 1, 2, 3 ] }');
-//
-//  CheckTemplateResult('123',
-//    '{% for item in array %}{{item}}{% endfor %}',
-//    '{ "array": [ 1, 2, 3 ] }');
-//
-//  CheckTemplateResult('abcd',
-//    '{%for item in array%}{{item}}{%endfor%}',
-//    '{ "array": [ "a", "b", "c", "d" ] }');
-//
-//  CheckTemplateResult('a b c', '{%for item in array%}{{item}}{%endfor%}',
-//      '{ "array": [ "a", " ", "b", " ", "c" ] }');
+  CheckTemplateResult(' 1  2  3 ',
+    '{%for item in array%} {{item}} {%endfor%}',
+    '{ "array": [ 1, 2, 3 ] }');
+
+  CheckTemplateResult('123',
+    '{%for item in array%}{{item}}{%endfor%}',
+    '{ "array": [ 1, 2, 3 ] }');
+
+  CheckTemplateResult('123',
+    '{% for item in array %}{{item}}{% endfor %}',
+    '{ "array": [ 1, 2, 3 ] }');
+
+  CheckTemplateResult('abcd',
+    '{%for item in array%}{{item}}{%endfor%}',
+    '{ "array": [ "a", "b", "c", "d" ] }');
+
+  CheckTemplateResult('a b c', '{%for item in array%}{{item}}{%endfor%}',
+      '{ "array": [ "a", " ", "b", " ", "c" ] }');
 
   CheckTemplateResult('abc', '{%for item in array%}{{item}}{%endfor%}',
       '{ "array": [ "a", "", "b", "", "c" ] }');
@@ -2041,6 +2042,21 @@ begin
   CheckTemplateResult('foo', '{{ var1 | downcase }}');
   CheckTemplateResult('bar', '{{ var2 | downcase }}');
   CheckTemplateResult('', '{{ unknown | downcase }}');
+end;
+
+procedure StandardFilters.Slice;
+begin
+  CheckTemplateResult('', '{{ null | slice: 1 }}');
+  CheckTemplateResult('', '{{ "" | slice: 10 }}');
+
+  CheckTemplateResult('b', '{{ "abcdefg" | slice: 1 }}');
+  CheckTemplateResult('abc', '{{ "abcdefg" | slice: 0, 3 }}');
+  CheckTemplateResult('bcd', '{{ "abcdefg" | slice: 1, 3 }}');
+  CheckTemplateResult('efg', '{{ "abcdefg" | slice: -3, 3 }}');
+  CheckTemplateResult('efg', '{{ "abcdefg" | slice: -3, 30 }}');
+  CheckTemplateResult('efg', '{{ "abcdefg" | slice: 4, 30 }}');
+  CheckTemplateResult('a', '{{ "abc" | slice: -4, 2 }}');
+  CheckTemplateResult('', '{{ "abcdefg" | slice: -10, 1 }}');
 end;
 
 procedure StandardFilters.Upcase;
