@@ -7,6 +7,7 @@ uses
   System.Classes, System.Math,
   System.Generics.Collections,
   System.Rtti, System.TypInfo,
+  System.Character,
 
   Liquid.Interfaces,
   Liquid.Tuples,
@@ -24,6 +25,7 @@ type
     [Weak]
     FContext: ILiquidContext;
     FMethods: TDictionary<string, TClass>;
+    function ResolveMethodName(const MethodName: string): string;
   public
     class procedure GlobalFilter(AClass: TClass);
   public
@@ -56,6 +58,13 @@ type
     function Slice(const Input: string; Start: integer; Length: integer): string; overload;
     function Round(const Input: double): double; overload;
     function Round(const Input: double; Places: integer): double; overload;
+
+    function FormatFloat(Context: ILiquidContext; const Input: integer;
+      const Format: string): string; overload;
+    function FormatFloat(Context: ILiquidContext; const Input: double;
+      const Format: string): string; overload;
+    function FormatFloat(Context: ILiquidContext; const Input: extended;
+      const Format: string): string; overload;
   end;
 
 implementation
@@ -116,7 +125,7 @@ begin
   try
     for var Method in FMethods do
     begin
-      if Method.Key.ToLower <> FilterName.ToLower then
+      if ResolveMethodName(Method.Key) <> ResolveMethodName(FilterName) then
         Continue;
       for var RttiMethod in RttiContext.GetType(Method.Value).GetMethods(Method.Key) do
       begin
@@ -153,6 +162,28 @@ begin
     InvokeArgs.Free;
     RttiContext.Free;
   end;
+end;
+
+function TStrainer.ResolveMethodName(const MethodName: string): string;
+var
+  I: Integer;
+  Current, Before: Char;
+begin
+  Result := MethodName;
+  I := 2;
+  while I <= Length(Result) do
+  begin
+    Current := Result[I];
+    Before := Result[I - 1];
+    if Current.IsUpper and (Before <> '_') and Before.IsLower then
+    begin
+      Insert('_', Result, I);
+      Inc(I, 2);
+    end
+    else
+      Inc(I);
+  end;
+  Result := LowerCase(Result);
 end;
 
 { TGenericFilter }
@@ -192,6 +223,24 @@ end;
 function TStandardFilters.Downcase(const Input: string): string;
 begin
   Result := Input.ToLower;
+end;
+
+function TStandardFilters.FormatFloat(Context: ILiquidContext;
+  const Input: double; const Format: string): string;
+begin
+  Result := System.SysUtils.FormatFloat(Format, Input, Context.FormatSettings);
+end;
+
+function TStandardFilters.FormatFloat(Context: ILiquidContext;
+  const Input: extended; const Format: string): string;
+begin
+  Result := System.SysUtils.FormatFloat(Format, Input, Context.FormatSettings);
+end;
+
+function TStandardFilters.FormatFloat(Context: ILiquidContext;
+  const Input: integer; const Format: string): string;
+begin
+  Result := System.SysUtils.FormatFloat(Format, Input, Context.FormatSettings);
 end;
 
 function TStandardFilters.Round(const Input: double; Places: integer): double;

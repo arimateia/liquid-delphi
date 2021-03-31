@@ -164,6 +164,9 @@ type
     procedure Date;
     procedure Slice;
     procedure Round;
+
+    //
+    procedure FormatFloat;
   end;
 
   Template = class(LiquidBaseTestCase)
@@ -603,7 +606,7 @@ end;
 procedure Variables.DateTimeVariable;
 begin
   var FormatSettings := TFormatSettings.Invariant;
-  var Context := TLiquidContext.Create(TFormatSettings.Invariant);
+  var Context := TLiquidContext.Create(FormatSettings);
   SetContext(Context);
 
   var Json := '{"published_at":"2013-12-25"}';
@@ -2079,6 +2082,21 @@ begin
   CheckTemplateResult('foo', '{{ var1 | downcase }}');
   CheckTemplateResult('bar', '{{ var2 | downcase }}');
   CheckTemplateResult('', '{{ unknown | downcase }}');
+end;
+
+procedure StandardFilters.FormatFloat;
+begin
+  var FormatSettings := TFormatSettings.Invariant;
+  FormatSettings.DecimalSeparator := ',';
+  FormatSettings.ThousandSeparator := '.';
+  var Context := TLiquidContext.Create(FormatSettings);
+  SetContext(Context);
+
+//  CheckTemplateResult('1,23', '{{ 1.234678 | format_float: "#,0.00" }}');
+//  CheckTemplateResult('0,00', '{{ 0 | format_float: "#,0.00" }}');
+//  CheckTemplateResult('0,00', '{{ 0.0 | format_float: "#,0.00" }}');
+  CheckTemplateResult('19,00', '{{ 19 | format_float: "#,0.00" }}');
+//  CheckTemplateResult('123.456,79', '{{ 123456.787 | format_float: "#,0.00" }}');
 end;
 
 procedure StandardFilters.Round;
