@@ -428,7 +428,7 @@ end;
 
 procedure TFor.UnknownTag(const Tag, Markup: string; Tokens: TList<string>);
 begin
-  if Tag.Equals('elsefor') or Tag.Equals('else') then
+  if Tag.Equals('else') then
   begin
     FElseBlock := TElseCondition.Create;
     SetNodeList(FElseBlock.Attach(TNodeList.Create));

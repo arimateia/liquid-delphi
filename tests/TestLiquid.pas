@@ -89,6 +89,7 @@ type
     procedure IfFromVariable;
     procedure NestedIf;
     procedure ComparisonsOnNull;
+    procedure ComparisonsOnObject;
     procedure ComparisonsOnArray;
     procedure ElseIf;
 
@@ -1499,6 +1500,24 @@ begin
   CheckTemplateResult('', '{% if 10 <= null %} NO {% endif %}');
   CheckTemplateResult('', '{% if 10 >= null %} NO {% endif %}');
   CheckTemplateResult('', '{% if 10 > null %} NO {% endif %}');
+end;
+
+procedure _If.ComparisonsOnObject;
+begin
+  CheckTemplateResult(' NO ', '{% if obj %} YES {% else %} NO {% endif %}',
+    '{"obj":null}');
+  CheckTemplateResult(' YES ', '{% if obj %} YES {% else %} NO {% endif %}',
+    '{"obj":{}}');
+
+  CheckTemplateResult(' NO ', '{% if obj.name %} YES {% else %} NO {% endif %}',
+    '{"obj":null}');
+  CheckTemplateResult(' NO ', '{% if obj.name %} YES {% else %} NO {% endif %}',
+    '{"obj":{}}');
+
+  CheckTemplateResult('', '{% if obj.name %} YES {% endif %}',
+    '{"obj":null}');
+  CheckTemplateResult('', '{% if obj.name %} YES {% endif %}',
+    '{"obj":{}}');
 end;
 
 procedure _If.ElseIf;
