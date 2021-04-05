@@ -65,6 +65,8 @@ type
       const Format: string): string; overload;
     function FormatFloat(Context: ILiquidContext; const Input: extended;
       const Format: string): string; overload;
+
+    function Abs(const Input: integer): integer; overload;
   end;
 
 implementation
@@ -200,6 +202,11 @@ begin
 end;
 
 { TStandardFilters }
+
+function TStandardFilters.Abs(const Input: integer): integer;
+begin
+  Result := System.Abs(Input);
+end;
 
 function TStandardFilters.Append(const Input, Value: string): string;
 begin

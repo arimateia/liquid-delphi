@@ -165,6 +165,7 @@ type
     procedure Date;
     procedure Slice;
     procedure Round;
+    procedure Abs;
 
     //
     procedure FormatFloat;
@@ -2006,6 +2007,12 @@ begin
 end;
 
 { StandardFilters }
+
+procedure StandardFilters.Abs;
+begin
+  CheckTemplateResult('17', '{{ -17 | abs }}');
+  CheckTemplateResult('17', '{{ 17 | abs }}');
+end;
 
 procedure StandardFilters.Append;
 begin
